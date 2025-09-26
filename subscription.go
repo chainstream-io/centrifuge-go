@@ -50,6 +50,8 @@ type SubscriptionConfig struct {
 	JoinLeave bool
 	// Delta allows to specify delta type for the subscription. By default, no delta is used.
 	Delta DeltaType
+	// Filter expression for subscription.
+	Filter string
 	// MinResubscribeDelay is the minimum delay between resubscription attempts.
 	// This delay is jittered.
 	// Zero value means 200 * time.Millisecond.
@@ -84,6 +86,7 @@ func newSubscription(c *Client, channel string, config ...SubscriptionConfig) *S
 		s.recoverable = cfg.Recoverable
 		s.joinLeave = cfg.JoinLeave
 		s.deltaType = cfg.Delta
+		s.filter = cfg.Filter
 	}
 	return s
 }
@@ -124,6 +127,8 @@ type Subscription struct {
 	deltaType       DeltaType
 	deltaNegotiated bool
 	prevData        []byte
+
+	filter string
 
 	inflight atomic.Bool
 }
@@ -775,7 +780,7 @@ func (s *Subscription) resubscribe() {
 		sp.Epoch = s.epoch
 	}
 
-	err := s.centrifuge.sendSubscribe(s.Channel, s.data, isRecover, sp, token, s.positioned, s.recoverable, s.joinLeave, s.deltaType, func(res *protocol.SubscribeResult, err error) {
+	err := s.centrifuge.sendSubscribe(s.Channel, s.data, isRecover, sp, token, s.positioned, s.recoverable, s.joinLeave, s.deltaType, s.filter, func(res *protocol.SubscribeResult, err error) {
 		if err != nil {
 			s.inflight.Store(false)
 			s.subscribeError(err)

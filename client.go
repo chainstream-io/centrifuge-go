@@ -1613,7 +1613,7 @@ type StreamPosition struct {
 
 func (c *Client) sendSubscribe(
 	channel string, data []byte, recover bool, streamPos StreamPosition, token string,
-	positioned bool, recoverable bool, joinLeave bool, deltaType DeltaType,
+	positioned bool, recoverable bool, joinLeave bool, deltaType DeltaType, filter string,
 	fn func(res *protocol.SubscribeResult, err error),
 ) error {
 	params := &protocol.SubscribeRequest{
@@ -1635,6 +1635,9 @@ func (c *Client) sendSubscribe(
 
 	if deltaType != DeltaTypeNone {
 		params.Delta = string(deltaType)
+	}
+	if filter != "" {
+		params.Filter = filter
 	}
 
 	cmd := &protocol.Command{

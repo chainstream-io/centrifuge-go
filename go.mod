@@ -1,6 +1,8 @@
 module github.com/centrifugal/centrifuge-go
 
-go 1.22
+go 1.23
+
+toolchain go1.24.7
 
 require (
 	github.com/centrifugal/protocol v0.16.0
@@ -15,7 +17,9 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/planetscale/vtprotobuf v0.6.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/segmentio/encoding v0.4.0 // indirect
+	github.com/segmentio/encoding v0.5.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 )
+
+replace github.com/centrifugal/protocol => github.com/chainstream-io/protocol v0.0.0-20250809142339-f22827f207fe
