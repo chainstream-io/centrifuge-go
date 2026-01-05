@@ -1,11 +1,11 @@
-module github.com/centrifugal/centrifuge-go/examples
+module github.com/chainstream-io/centrifuge-go/examples
 
 go 1.22
 
-replace github.com/centrifugal/centrifuge-go => ../
+replace github.com/chainstream-io/centrifuge-go => ../
 
 require (
-	github.com/centrifugal/centrifuge-go v0.10.4
+	github.com/chainstream-io/centrifuge-go v0.10.4
 	github.com/golang-jwt/jwt/v5 v5.2.2
 )
 

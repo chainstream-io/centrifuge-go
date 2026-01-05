@@ -1,4 +1,4 @@
-module github.com/centrifugal/centrifuge-go
+module github.com/chainstream-io/centrifuge-go
 
 go 1.23
 

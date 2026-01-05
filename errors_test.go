@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/centrifugal/centrifuge-go"
+	"github.com/chainstream-io/centrifuge-go"
 )
 
 func TestErrors(t *testing.T) {
