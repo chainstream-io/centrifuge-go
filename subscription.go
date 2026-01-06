@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/centrifugal/protocol"
+	"github.com/chainstream-io/protocol"
 	fossil "github.com/shadowspore/fossil-delta"
 )
 

@@ -3,7 +3,7 @@ package centrifuge
 import (
 	"fmt"
 
-	"github.com/centrifugal/protocol"
+	"github.com/chainstream-io/protocol"
 )
 
 // Publication is a data sent to channel.

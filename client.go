@@ -14,7 +14,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/centrifugal/protocol"
+	"github.com/chainstream-io/protocol"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 

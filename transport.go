@@ -3,7 +3,7 @@ package centrifuge
 import (
 	"time"
 
-	"github.com/centrifugal/protocol"
+	"github.com/chainstream-io/protocol"
 )
 
 type transport interface {

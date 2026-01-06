@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/centrifugal/protocol"
+	"github.com/chainstream-io/protocol"
 	"github.com/gorilla/websocket"
 )
 

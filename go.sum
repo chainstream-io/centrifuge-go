@@ -1,5 +1,5 @@
-github.com/chainstream-io/protocol v0.0.0-20250809142339-f22827f207fe h1:07Me14TPvS/XoAq7HSd/YwlpeKaLF9NpYMInerJ4+M4=
-github.com/chainstream-io/protocol v0.0.0-20250809142339-f22827f207fe/go.mod h1:Hcx0Xy/MhCT85Zno3umflh91oJ+FCKk9EPk/MINZhmQ=
+github.com/chainstream-io/protocol v0.0.1 h1:LBQ2X+r3SXtxNTVJFaXVcP7jp5i2f8OyGYty4ojDsZE=
+github.com/chainstream-io/protocol v0.0.1/go.mod h1:LVtbpkrLFf88ZZNQf2moLIh+nOECLPFThUJIxGUiLB0=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
