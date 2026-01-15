@@ -255,6 +255,19 @@ func (c *Client) SetToken(token string) {
 	c.mu.Unlock()
 }
 
+// SetHttpHeaders allows updating Client's HTTP headers for WebSocket handshake.
+// This is useful for updating Authorization header when token is refreshed.
+func (c *Client) SetHttpHeaders(headers http.Header) {
+	c.mu.Lock()
+	if c.config.Header == nil {
+		c.config.Header = http.Header{}
+	}
+	for key, values := range headers {
+		c.config.Header[key] = values
+	}
+	c.mu.Unlock()
+}
+
 // NewSubscription allocates new Subscription on a channel. As soon as Subscription
 // successfully created Client keeps reference to it inside internal map registry to
 // manage automatic resubscribe on reconnect. After creating Subscription call its
