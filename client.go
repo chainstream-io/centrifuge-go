@@ -1063,6 +1063,59 @@ func (c *Client) startReconnecting() error {
 	getTokenFunc := c.config.GetToken
 	c.mu.Unlock()
 
+	// Refresh token BEFORE creating transport so that HTTP headers can be updated
+	if refreshRequired || (token == "" && getTokenFunc != nil) {
+		// Try to refresh token.
+		if c.logLevelEnabled(LogLevelDebug) {
+			c.log(LogLevelDebug, "refreshing token before transport creation", nil)
+		}
+		newToken, err := c.refreshToken()
+		if err != nil {
+			if errors.Is(err, ErrUnauthorized) {
+				if c.logLevelEnabled(LogLevelDebug) {
+					c.log(LogLevelDebug, "unauthorized error, move to disconnected", nil)
+				}
+				c.moveToDisconnected(disconnectedUnauthorized, "unauthorized")
+				return nil
+			}
+			if c.logLevelEnabled(LogLevelDebug) {
+				c.log(LogLevelDebug, "error refreshing token", map[string]string{
+					"error": err.Error(),
+				})
+			}
+			c.handleError(RefreshError{err})
+			c.mu.Lock()
+			if c.state != StateConnecting {
+				if c.logLevelEnabled(LogLevelDebug) {
+					c.log(LogLevelDebug, "not in connecting state, no need to continue", map[string]string{
+						"state": string(c.state),
+					})
+				}
+				c.mu.Unlock()
+				return nil
+			}
+			c.scheduleReconnectLocked()
+			c.mu.Unlock()
+			return err
+		} else {
+			c.mu.Lock()
+			c.token = newToken
+			c.refreshRequired = false
+			if c.state != StateConnecting {
+				if c.logLevelEnabled(LogLevelDebug) {
+					c.log(LogLevelDebug, "got token, but not in connecting state anymore", map[string]string{
+						"state": string(c.state),
+					})
+				}
+				c.mu.Unlock()
+				return nil
+			}
+			c.mu.Unlock()
+		}
+	}
+
+	// Now create websocket config with potentially updated headers
+	c.mu.RLock()
 	wsConfig := websocketConfig{
 		Proxy:             c.config.Proxy,
 		NetDialContext:    c.config.NetDialContext,
@@ -1072,6 +1125,7 @@ func (c *Client) startReconnecting() error {
 		CookieJar:         c.config.CookieJar,
 		Header:            c.config.Header,
 	}
+	c.mu.RUnlock()
 
 	u := c.endpoints[round%len(c.endpoints)]
 	if c.logLevelEnabled(LogLevelDebug) {
@@ -1103,56 +1157,6 @@ func (c *Client) startReconnecting() error {
 		c.log(LogLevelDebug, "new transport created", nil)
 	}
 
-	if refreshRequired || (token == "" && getTokenFunc != nil) {
-		// Try to refresh token.
-		if c.logLevelEnabled(LogLevelDebug) {
-			c.log(LogLevelDebug, "refreshing token", nil)
-		}
-		newToken, err := c.refreshToken()
-		if err != nil {
-			if errors.Is(err, ErrUnauthorized) {
-				if c.logLevelEnabled(LogLevelDebug) {
-					c.log(LogLevelDebug, "unauthorized error, move to disconnected", nil)
-				}
-				c.moveToDisconnected(disconnectedUnauthorized, "unauthorized")
-				return nil
-			}
-			if c.logLevelEnabled(LogLevelDebug) {
-				c.log(LogLevelDebug, "error refreshing token", map[string]string{
-					"error": err.Error(),
-				})
-			}
-			c.handleError(RefreshError{err})
-			c.mu.Lock()
-			if c.state != StateConnecting {
-				if c.logLevelEnabled(LogLevelDebug) {
-					c.log(LogLevelDebug, "not in connecting state, no need to continue", map[string]string{
-						"state": string(c.state),
-					})
-				}
-				_ = t.Close()
-				c.mu.Unlock()
-				return nil
-			}
-			c.scheduleReconnectLocked()
-			c.mu.Unlock()
-			return err
-		} else {
-			c.mu.Lock()
-			c.token = newToken
-			if c.state != StateConnecting {
-				if c.logLevelEnabled(LogLevelDebug) {
-					c.log(LogLevelDebug, "got token, but not in connecting state anymore", map[string]string{
-						"state": string(c.state),
-					})
-				}
-				c.mu.Unlock()
-				return nil
-			}
-			c.mu.Unlock()
-		}
-	}
-
 	c.mu.Lock()
 	if c.state != StateConnecting {
 		if c.logLevelEnabled(LogLevelDebug) {
@@ -1164,7 +1168,6 @@ func (c *Client) startReconnecting() error {
 		c.mu.Unlock()
 		return nil
 	}
-	c.refreshRequired = false
 	disconnectCh := make(chan struct{})
 	c.receive = make(chan []byte, 64)
 	c.transport = t
